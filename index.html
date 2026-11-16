@@ -130,6 +130,15 @@
   }
   .listo h2{margin:0 0 8px;font-size:25px;font-weight:700;color:var(--navy)}
   .listo p{margin:0 0 20px;color:var(--gris);max-width:30em;margin-inline:auto}
+  .tilde.esperando{background:#C3C9D6}
+  .tilde.falla{background:#A4433F}
+  .listo.falla h2{color:#92333A}
+  .listo .reintentar{
+    display:none;margin:0 auto 22px;font-family:"Archivo",sans-serif;font-size:16px;
+    font-weight:600;background:#92333A;color:#fff;border:none;border-radius:7px;
+    padding:12px 24px;cursor:pointer;
+  }
+  .listo.falla .reintentar{display:block}
   .resumen{
     background:#fff;border:1px solid var(--linea);border-radius:8px;
     padding:14px 16px;margin:0 auto 24px;max-width:460px;text-align:left;
@@ -206,9 +215,10 @@
   </form>
 
   <div class="listo" id="listo">
-    <div class="tilde">✓</div>
-    <h2>Votos enviados</h2>
-    <p>La mesa <b id="mesaOk"></b> quedó registrada. Ya están en la pantalla del salón.</p>
+    <div class="tilde esperando" id="tilde">…</div>
+    <h2 id="listoTit">Enviando…</h2>
+    <p id="listoTxt">Esperá la confirmación antes de cerrar.</p>
+    <button type="button" class="reintentar" id="reintentar">Reintentar envío</button>
     <div class="resumen" id="resumen"></div>
     <button type="button" id="corregir">Corregir y volver a enviar</button>
   </div>
@@ -225,7 +235,7 @@
 
 <script>
 /* ====== CONFIGURACIÓN ====== */
-const API = 'PEGAR_ACA_LA_URL_/exec';   // URL de implementación del Apps Script
+const API = 'https://script.google.com/macros/s/AKfycbzcXFqBmba2IqPjy2mEJ_clRw_giKknf5q3B6Gw2-53tJyC25LFWInjSsbMu-xeQ2ExVA/exec';   // URL de implementación del Apps Script
 const POR_PERSONA = 7;                   // cuántos proyectos elige cada integrante
 /* =========================== */
 
@@ -429,24 +439,20 @@ btn.addEventListener('click', async () => {
     btn.textContent = 'Enviar igual';
     return;
   }
+  // Sin URL de Apps Script no hay nada que hacer: avisarlo acá y no fingir un envío.
+  if(API.indexOf('PEGAR_ACA') !== -1){
+    aviso.innerHTML = 'El formulario todavía no está conectado a la planilla. ' +
+      'Avisale al equipo del taller antes de seguir.';
+    aviso.classList.add('on');
+    return;
+  }
   aviso.classList.remove('on');
 
   btn.disabled = true;
   btn.textContent = 'Enviando…';
 
-  const datos = {mesa: m, integrantes: parseInt(integr.value, 10) || 0, votos: votos, ts: Date.now()};
-  try{
-    await fetch(API, {
-      method:'POST',
-      mode:'no-cors',
-      headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify(datos)
-    });
-  }catch(err){ /* respuesta opaca por no-cors: el registro igual se escribe */ }
-
   const elegidos = PROYECTOS.filter(p => votos[p.cod] > 0)
     .sort((a,b) => votos[b.cod] - votos[a.cod] || a.n - b.n);
-  document.getElementById('mesaOk').textContent = m;
   document.getElementById('resumen').innerHTML = elegidos.map(p =>
     '<div><span>' + p.cod + ' · ' + p.corto + '</span><span class="n">' + votos[p.cod] + '</span></div>'
   ).join('');
@@ -455,6 +461,63 @@ btn.addEventListener('click', async () => {
   pie.style.display  = 'none';
   listo.classList.add('on');
   window.scrollTo(0,0);
+  enviar(m);
+});
+
+/* Envía y después confirma contra la planilla. Con mode:'no-cors' la respuesta
+   del POST es opaca, así que la única forma de saber si quedó guardado es
+   volver a preguntar. Mientras no haya confirmación, no se muestra el tilde. */
+async function enviar(m){
+  const tilde = document.getElementById('tilde');
+  const tit   = document.getElementById('listoTit');
+  const txt   = document.getElementById('listoTxt');
+
+  listo.classList.remove('falla');
+  tilde.className = 'tilde esperando';
+  tilde.textContent = '…';
+  tit.textContent = 'Enviando…';
+  txt.textContent = 'Esperá la confirmación antes de cerrar.';
+
+  const datos = {mesa: m, integrantes: parseInt(integr.value, 10) || 0,
+                 votos: votos, ts: Date.now()};
+  try{
+    await fetch(API, {
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(datos)
+    });
+  }catch(err){ /* sigue igual: la verificación de abajo es la que decide */ }
+
+  tit.textContent = 'Verificando…';
+  let ok = false;
+  for(let i = 0; i < 5 && !ok; i++){
+    await new Promise(r => setTimeout(r, 700 + i * 400));
+    try{
+      const r = await fetch(API + '?accion=verificar&mesa=' + m + '&t=' + Date.now());
+      const j = await r.json();
+      if(j && j.ok && j.registrada) ok = true;
+    }catch(e){ /* reintenta */ }
+  }
+
+  if(ok){
+    tilde.className = 'tilde';
+    tilde.textContent = '✓';
+    tit.textContent = 'Votos registrados';
+    txt.innerHTML = 'La mesa <b>' + m + '</b> quedó guardada. Ya está en la pantalla del salón.';
+  } else {
+    listo.classList.add('falla');
+    tilde.className = 'tilde falla';
+    tilde.textContent = '!';
+    tit.textContent = 'No se pudo confirmar';
+    txt.innerHTML = 'Los votos de la mesa <b>' + m + '</b> no aparecen en la planilla. ' +
+      'Probá de nuevo y, si sigue igual, avisale al equipo del taller.';
+  }
+}
+
+document.getElementById('reintentar').addEventListener('click', () => {
+  const m = parseInt(mesa.value, 10);
+  if(m) enviar(m);
 });
 
 document.getElementById('corregir').addEventListener('click', () => {
