@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Votación de proyectos — Taller 2 · PEDI FOUNNE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Narrow:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B3F71;
+    --violeta:#7654A0;
+    --teal:#4097AB;
+    --azul:#4A7BB3;
+    --magenta:#A8548C;
+    --papel:#F5F6FA;
+    --tinta:#1F2B3D;
+    --gris:#64708A;
+    --linea:#DFE3ED;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--papel);color:var(--tinta);
+    font-family:"Archivo","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    font-size:17px;line-height:1.45;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:660px;margin:0 auto;padding:0 16px 150px}
+
+  /* ---------- Encabezado ---------- */
+  header{background:var(--navy);color:#fff;padding:24px 16px 0}
+  .head-in{max-width:660px;margin:0 auto}
+  header .kicker{
+    font-family:"Archivo Narrow","Archivo",sans-serif;
+    font-size:13px;letter-spacing:.12em;color:#9BB4D2;margin:0 0 8px;text-transform:uppercase;
+  }
+  header h1{margin:0 0 10px;font-size:27px;line-height:1.12;font-weight:700;letter-spacing:-.015em}
+  .regla{width:86px;height:4px;background:var(--violeta);border-radius:2px;margin:0 0 14px}
+  header p{margin:0 0 22px;color:#C3D2E6;font-size:15px;max-width:36em}
+  .arco{display:block;width:100%;height:16px}
+
+  /* ---------- Datos de la mesa ---------- */
+  .datos{
+    background:#fff;border:1px solid var(--linea);border-radius:8px;
+    padding:14px 16px;margin:20px 0 18px;display:flex;gap:14px;flex-wrap:wrap;
+  }
+  .dato{flex:1 1 150px;min-width:150px}
+  .dato label{display:block;font-weight:600;font-size:15.5px;color:var(--navy)}
+  .dato small{display:block;font-weight:400;color:var(--gris);font-size:13.5px;margin:1px 0 7px}
+  .dato input{
+    width:100%;font-family:"Archivo",sans-serif;font-size:27px;font-weight:700;text-align:center;
+    color:var(--navy);padding:6px;border:2px solid var(--linea);border-radius:7px;background:#fff;
+  }
+  .dato input:focus{outline:none;border-color:var(--violeta);box-shadow:0 0 0 3px rgba(118,84,160,.20)}
+
+  .consigna{
+    background:#fff;border:1px solid var(--linea);border-radius:8px;padding:15px 16px;margin:0 0 20px;
+  }
+  .consigna p{margin:0;font-size:16.5px;font-weight:600;color:var(--navy);line-height:1.35}
+  .consigna small{display:block;margin-top:8px;color:var(--gris);font-size:14px;font-weight:400}
+
+  /* ---------- Líneas estratégicas ---------- */
+  .linea-bloque{margin:0 0 22px}
+  .linea-tit{
+    display:flex;align-items:center;gap:9px;margin:0 0 9px;padding:0 2px;
+  }
+  .linea-tit .bolita{width:11px;height:11px;border-radius:50%;flex:0 0 auto}
+  .linea-tit h2{
+    margin:0;font-family:"Archivo Narrow",sans-serif;font-size:14px;font-weight:700;
+    letter-spacing:.09em;text-transform:uppercase;color:var(--gris);
+  }
+
+  /* ---------- Proyecto ---------- */
+  .proy{
+    background:#fff;border:1px solid var(--linea);border-left-width:4px;border-radius:7px;
+    padding:11px 12px;margin:0 0 8px;display:flex;align-items:center;gap:12px;
+  }
+  .proy.votado{background:#FCFDFF;border-color:#B9C9E2;border-left-width:4px}
+  .proy.excede{background:#FDF4F4;border-color:#E0A9A6}
+  .proy.excede .nom{color:#92333A}
+  .proy .txt{flex:1 1 auto;min-width:0}
+  .proy .cod{
+    font-family:"Archivo Narrow",sans-serif;font-size:12.5px;font-weight:700;
+    letter-spacing:.05em;color:var(--gris);display:block;margin-bottom:1px;
+  }
+  .proy .nom{font-size:15.5px;font-weight:600;color:var(--tinta);line-height:1.28;display:block}
+  .proy.votado .nom{color:var(--navy)}
+
+  .stepper{flex:0 0 auto;display:flex;align-items:center;gap:7px}
+  .stepper button{
+    width:40px;height:40px;flex:0 0 auto;border-radius:7px;border:1px solid var(--linea);
+    background:#F3F5F9;color:var(--navy);font-family:"Archivo",sans-serif;font-size:24px;
+    font-weight:700;line-height:1;cursor:pointer;padding:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .stepper button:active{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .stepper button:disabled{opacity:.35;cursor:not-allowed}
+  .stepper .val{
+    width:40px;text-align:center;font-size:22px;font-weight:700;color:var(--navy);
+    font-variant-numeric:tabular-nums;
+  }
+  .stepper .val.cero{color:#C3C9D6;font-weight:400}
+  .stepper .val.mal{color:#A4433F}
+
+  /* ---------- Pie fijo ---------- */
+  .pie{
+    position:fixed;left:0;right:0;bottom:0;background:rgba(245,246,250,.97);
+    border-top:1px solid var(--linea);padding:11px 16px calc(11px + env(safe-area-inset-bottom));
+    backdrop-filter:blur(6px);z-index:10;
+  }
+  .pie-in{max-width:660px;margin:0 auto;display:flex;align-items:center;gap:14px}
+  .estado{flex:1 1 auto;font-size:14px;color:var(--gris);line-height:1.32}
+  .estado b{color:var(--navy)}
+  .estado .alerta{color:#A4433F;font-weight:600}
+  .estado .ok{color:var(--teal);font-weight:600}
+  button#enviar{
+    flex:0 0 auto;font-family:"Archivo",sans-serif;font-size:17px;font-weight:600;
+    background:var(--navy);color:#fff;border:none;border-radius:7px;padding:14px 26px;cursor:pointer;
+  }
+  button#enviar:disabled{background:#AEB7C9;cursor:not-allowed}
+  button#enviar:not(:disabled):active{background:var(--violeta)}
+
+  /* ---------- Confirmación ---------- */
+  .listo{display:none;text-align:center;padding:56px 10px 40px}
+  .listo.on{display:block}
+  .tilde{
+    width:76px;height:76px;border-radius:50%;background:var(--teal);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px;
+  }
+  .listo h2{margin:0 0 8px;font-size:25px;font-weight:700;color:var(--navy)}
+  .listo p{margin:0 0 20px;color:var(--gris);max-width:30em;margin-inline:auto}
+  .resumen{
+    background:#fff;border:1px solid var(--linea);border-radius:8px;
+    padding:14px 16px;margin:0 auto 24px;max-width:460px;text-align:left;
+  }
+  .resumen div{
+    display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:15px;
+    border-bottom:1px solid #EDF0F5;
+  }
+  .resumen div:last-child{border-bottom:none}
+  .resumen .n{font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+  .listo button{
+    font-family:"Archivo",sans-serif;font-size:16px;background:#fff;color:var(--navy);
+    border:1px solid var(--navy);border-radius:7px;padding:11px 22px;cursor:pointer;
+  }
+  .aviso{
+    display:none;margin:12px 0 0;padding:11px 13px;border-radius:7px;background:#FBF1F1;
+    border:1px solid #E7C4C4;color:#92333A;font-size:15px;
+  }
+  .aviso.on{display:block}
+  .marca{
+    margin:28px 0 0;padding-top:16px;border-top:1px solid var(--linea);
+    font-family:"Archivo Narrow",sans-serif;font-size:12.5px;color:#93A0B8;
+    letter-spacing:.04em;text-align:center;
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .listo.on .tilde{animation:pop .32s ease-out}
+    @keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-in">
+    <p class="kicker">Taller participativo 2 · PEDI 2027–2032</p>
+    <h1>Votación de proyectos</h1>
+    <div class="regla"></div>
+    <p>Carguen cuántos votos recibió cada proyecto en su mesa. Una sola persona carga por todos.</p>
+  </div>
+  <svg class="arco" viewBox="0 0 660 16" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="gpedi" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%"   stop-color="#4097AB"/>
+        <stop offset="50%"  stop-color="#4A7BB3"/>
+        <stop offset="100%" stop-color="#7654A0"/>
+      </linearGradient>
+    </defs>
+    <path d="M0 16 Q330 -10 660 16" fill="none" stroke="url(#gpedi)" stroke-width="4"/>
+  </svg>
+</header>
+
+<div class="wrap">
+  <form id="form" novalidate>
+    <div class="datos">
+      <div class="dato">
+        <label for="mesa">Número de mesa</label>
+        <small>Está en el cartel de la mesa</small>
+        <input id="mesa" type="number" inputmode="numeric" min="1" max="99" placeholder="—">
+      </div>
+      <div class="dato">
+        <label for="integrantes">Integrantes</label>
+        <small>Cuántos votaron en la mesa</small>
+        <input id="integrantes" type="number" inputmode="numeric" min="1" max="30" placeholder="—">
+      </div>
+    </div>
+
+    <div class="consigna">
+      <p>Cada integrante elige los 7 proyectos más relevantes.</p>
+      <small>Después cuenten los votos de cada proyecto y cárguenlos acá. Los que no recibieron votos quedan en cero, y ninguno puede superar la cantidad de integrantes.</small>
+    </div>
+
+    <div id="lineas"></div>
+    <div class="aviso" id="aviso"></div>
+  </form>
+
+  <div class="listo" id="listo">
+    <div class="tilde">✓</div>
+    <h2>Votos enviados</h2>
+    <p>La mesa <b id="mesaOk"></b> quedó registrada. Ya están en la pantalla del salón.</p>
+    <div class="resumen" id="resumen"></div>
+    <button type="button" id="corregir">Corregir y volver a enviar</button>
+  </div>
+
+  <p class="marca">Plan Estratégico de Desarrollo Institucional<br>Facultad de Odontología · UNNE</p>
+</div>
+
+<div class="pie" id="pie">
+  <div class="pie-in">
+    <div class="estado" id="estado">Completá el número de mesa para empezar</div>
+    <button type="button" id="enviar" disabled>Enviar</button>
+  </div>
+</div>
+
+<script>
+/* ====== CONFIGURACIÓN ====== */
+const API = 'PEGAR_ACA_LA_URL_/exec';   // URL de implementación del Apps Script
+const POR_PERSONA = 7;                   // cuántos proyectos elige cada integrante
+/* =========================== */
+
+const LINEAS = [
+  {id:1, nombre:'Línea 1 · Formación Académica de Excelencia', color:'#4097AB'},
+  {id:2, nombre:'Línea 2 · Gestión, Infraestructura y Equipamiento', color:'#4A7BB3'},
+  {id:3, nombre:'Línea 3 · Producción Científica, Extensión y Proyección', color:'#7654A0'},
+  {id:4, nombre:'Línea 4 · Identidad, Bienestar y Comunicación', color:'#A8548C'}
+];
+
+/* Los 20 proyectos de la matriz consolidada. 'corto' es el rótulo de la pantalla. */
+const PROYECTOS = [
+  {n:1,  cod:'1.2.a',       linea:1, nombre:'Actualización de los planes de estudio', corto:'Planes de estudio'},
+  {n:2,  cod:'1.2.c',       linea:1, nombre:'Expansión del posgrado y especializaciones', corto:'Posgrado y especializaciones'},
+  {n:3,  cod:'1.3.f',       linea:1, nombre:'Optimización de la Práctica Profesional Supervisada (PPS)', corto:'Práctica Profesional Supervisada'},
+  {n:4,  cod:'1.3.a',       linea:1, nombre:'Modalidades de cursado y reducción de cargas ocultas', corto:'Modalidades de cursado'},
+  {n:5,  cod:'1.3.e',       linea:1, nombre:'Integración de odontología digital e inteligencia artificial', corto:'Odontología digital e IA'},
+  {n:6,  cod:'1.1.a',       linea:1, nombre:'Formación docente continua y perfeccionamiento pedagógico', corto:'Formación docente continua'},
+  {n:7,  cod:'1.2.d',       linea:1, nombre:'Acompañamiento e inserción de estudiantes y graduados', corto:'Inserción de estudiantes y graduados'},
+  {n:8,  cod:'2.1.b',       linea:2, nombre:'Plan Master de Infraestructura y Servicios Edilicios', corto:'Plan Master de Infraestructura'},
+  {n:9,  cod:'2.1.c',       linea:2, nombre:'Gestión y modernización del equipamiento clínico y preclínico', corto:'Equipamiento clínico'},
+  {n:10, cod:'2.3.b',       linea:2, nombre:'Transparencia en la carrera docente y nodocente', corto:'Transparencia en carrera docente'},
+  {n:11, cod:'2.2.a',       linea:2, nombre:'Gobernanza democrática y cogobierno', corto:'Gobernanza y cogobierno'},
+  {n:12, cod:'3.1.a',       linea:3, nombre:'Líneas de investigación prioritarias en salud bucal', corto:'Líneas de investigación'},
+  {n:13, cod:'3.4.a',       linea:3, nombre:'Consolidación del Hospital Universitario Odontológico', corto:'Hospital Universitario'},
+  {n:14, cod:'3.1.c',       linea:3, nombre:'Promoción y gestión de financiamiento para la investigación', corto:'Financiamiento para investigación'},
+  {n:15, cod:'3.3.a',       linea:3, nombre:'Curricularización de la extensión universitaria', corto:'Curricularización de la extensión'},
+  {n:16, cod:'3.3.b/3.3.c', linea:3, nombre:'Red de alianzas estratégicas y convenios interinstitucionales', corto:'Alianzas y convenios'},
+  {n:17, cod:'4.1.a',       linea:4, nombre:'Difusión y gestión de becas', corto:'Becas'},
+  {n:18, cod:'4.1.d',       linea:4, nombre:'Actividades culturales y deportivas', corto:'Actividades culturales y deportivas'},
+  {n:19, cod:'4.2.b',       linea:4, nombre:'Fortalecimiento del área de comunicación institucional', corto:'Comunicación institucional'},
+  {n:20, cod:'4.2.a/4.2.c', linea:4, nombre:'Creando valor público: promoción de la salud bucal', corto:'Promoción de la salud bucal'}
+];
+
+const votos = {};
+PROYECTOS.forEach(p => votos[p.cod] = 0);
+
+/* ---------- armado de la lista ---------- */
+const cont = document.getElementById('lineas');
+LINEAS.forEach(L => {
+  const bloque = document.createElement('section');
+  bloque.className = 'linea-bloque';
+  bloque.innerHTML =
+    '<div class="linea-tit"><span class="bolita" style="background:' + L.color + '"></span>' +
+    '<h2>' + L.nombre + '</h2></div>';
+
+  PROYECTOS.filter(p => p.linea === L.id).forEach(p => {
+    const fila = document.createElement('div');
+    fila.className = 'proy';
+    fila.style.borderLeftColor = L.color;
+    fila.dataset.cod = p.cod;
+    fila.innerHTML =
+      '<div class="txt">' +
+        '<span class="cod">' + p.n + ' · ' + p.cod + '</span>' +
+        '<span class="nom">' + p.nombre + '</span>' +
+      '</div>' +
+      '<div class="stepper">' +
+        '<button type="button" data-op="menos" aria-label="Quitar un voto a ' + p.cod + '">−</button>' +
+        '<span class="val cero" data-val>0</span>' +
+        '<button type="button" data-op="mas" aria-label="Sumar un voto a ' + p.cod + '">+</button>' +
+      '</div>';
+    bloque.appendChild(fila);
+  });
+  cont.appendChild(bloque);
+});
+
+const mesa   = document.getElementById('mesa');
+const integr = document.getElementById('integrantes');
+const estado = document.getElementById('estado');
+const btn    = document.getElementById('enviar');
+const aviso  = document.getElementById('aviso');
+const form   = document.getElementById('form');
+const listo  = document.getElementById('listo');
+const pie    = document.getElementById('pie');
+const CLAVE  = 'pedi_proyectos_mesa';
+
+/* ---------- borrador local ---------- */
+function guardar(){
+  try{
+    localStorage.setItem(CLAVE, JSON.stringify(
+      {mesa: mesa.value, integrantes: integr.value, votos: votos}));
+  }catch(e){}
+}
+function restaurar(){
+  try{
+    const d = JSON.parse(localStorage.getItem(CLAVE) || '{}');
+    if(d.mesa) mesa.value = d.mesa;
+    if(d.integrantes) integr.value = d.integrantes;
+    if(d.votos) Object.keys(votos).forEach(k => {
+      if(typeof d.votos[k] === 'number') votos[k] = d.votos[k];
+    });
+  }catch(e){}
+}
+restaurar();
+
+function total(){
+  return Object.values(votos).reduce((a,b) => a + b, 0);
+}
+function cantidadIntegrantes(){
+  const i = parseInt(integr.value, 10);
+  return Number.isInteger(i) && i > 0 ? i : null;
+}
+function esperado(){
+  const i = cantidadIntegrantes();
+  return i ? i * POR_PERSONA : null;
+}
+/* Cada integrante vota una sola vez por proyecto: ninguno puede superar
+   la cantidad de integrantes de la mesa. */
+function tope(){
+  return cantidadIntegrantes() || 99;
+}
+
+function refrescar(){
+  const T = tope();
+  let excedidos = 0;
+
+  document.querySelectorAll('.proy').forEach(fila => {
+    const v = votos[fila.dataset.cod];
+    const mal = v > T;
+    if(mal) excedidos++;
+    const span = fila.querySelector('[data-val]');
+    span.textContent = v;
+    span.classList.toggle('cero', v === 0);
+    span.classList.toggle('mal', mal);
+    fila.classList.toggle('votado', v > 0 && !mal);
+    fila.classList.toggle('excede', mal);
+    fila.querySelector('[data-op="menos"]').disabled = (v === 0);
+    fila.querySelector('[data-op="mas"]').disabled = (v >= T);
+  });
+
+  const t = total();
+  const e = esperado();
+  const m = parseInt(mesa.value, 10);
+  const mesaOk = Number.isInteger(m) && m > 0;
+
+  if(!mesaOk){
+    estado.innerHTML = 'Completá el número de mesa para empezar';
+  } else if(excedidos > 0){
+    estado.innerHTML = '<b>Mesa ' + m + '</b> · <span class="alerta">' + excedidos +
+      (excedidos === 1 ? ' proyecto supera' : ' proyectos superan') +
+      ' los ' + T + ' integrantes</span>' +
+      '<br><span style="font-size:13px">Corregilos para poder enviar</span>';
+  } else if(e === null){
+    estado.innerHTML = '<b>Mesa ' + m + '</b> · ' + t + ' votos cargados' +
+      '<br><span style="font-size:13px">Cargá los integrantes para controlar el total</span>';
+  } else if(t === e){
+    estado.innerHTML = '<b>Mesa ' + m + '</b> · ' + t + ' de ' + e + ' votos ' +
+      '<span class="ok">· cuadra</span>';
+  } else {
+    const dif = e - t;
+    estado.innerHTML = '<b>Mesa ' + m + '</b> · ' + t + ' de ' + e + ' votos' +
+      '<br><span class="alerta">' + (dif > 0 ? 'faltan ' + dif : 'sobran ' + (-dif)) + '</span>';
+  }
+  btn.disabled = !(mesaOk && t > 0 && excedidos === 0);
+  guardar();
+}
+
+/* ---------- interacción ---------- */
+cont.addEventListener('click', e => {
+  const b = e.target.closest('button[data-op]');
+  if(!b) return;
+  const cod = b.closest('.proy').dataset.cod;
+  if(b.dataset.op === 'mas'){
+    if(votos[cod] < tope()) votos[cod]++;
+  } else if(votos[cod] > 0){
+    votos[cod]--;
+  }
+  refrescar();
+});
+
+mesa.addEventListener('input', refrescar);
+integr.addEventListener('input', refrescar);
+form.addEventListener('keydown', e => { if(e.key === 'Enter') e.preventDefault(); });
+refrescar();
+
+/* ---------- envío ---------- */
+let forzar = false;
+
+btn.addEventListener('click', async () => {
+  const m = parseInt(mesa.value, 10);
+  if(!Number.isInteger(m) || m < 1){
+    aviso.textContent = 'Falta el número de mesa.';
+    aviso.classList.add('on'); mesa.focus(); return;
+  }
+  const t = total();
+  if(t === 0){
+    aviso.textContent = 'Todavía no cargaste ningún voto.';
+    aviso.classList.add('on'); return;
+  }
+
+  // El descuadre avisa pero no bloquea: la mesa decide si envía igual.
+  const e = esperado();
+  if(e !== null && t !== e && !forzar){
+    const dif = e - t;
+    aviso.innerHTML = 'Cargaste <b>' + t + '</b> votos y con ' + integr.value +
+      ' integrantes deberían ser <b>' + e + '</b> (' +
+      (dif > 0 ? 'faltan ' + dif : 'sobran ' + (-dif)) + '). ' +
+      'Revisá el conteo, o tocá Enviar otra vez para mandarlo así.';
+    aviso.classList.add('on');
+    forzar = true;
+    btn.textContent = 'Enviar igual';
+    return;
+  }
+  aviso.classList.remove('on');
+
+  btn.disabled = true;
+  btn.textContent = 'Enviando…';
+
+  const datos = {mesa: m, integrantes: parseInt(integr.value, 10) || 0, votos: votos, ts: Date.now()};
+  try{
+    await fetch(API, {
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(datos)
+    });
+  }catch(err){ /* respuesta opaca por no-cors: el registro igual se escribe */ }
+
+  const elegidos = PROYECTOS.filter(p => votos[p.cod] > 0)
+    .sort((a,b) => votos[b.cod] - votos[a.cod] || a.n - b.n);
+  document.getElementById('mesaOk').textContent = m;
+  document.getElementById('resumen').innerHTML = elegidos.map(p =>
+    '<div><span>' + p.cod + ' · ' + p.corto + '</span><span class="n">' + votos[p.cod] + '</span></div>'
+  ).join('');
+
+  form.style.display = 'none';
+  pie.style.display  = 'none';
+  listo.classList.add('on');
+  window.scrollTo(0,0);
+});
+
+document.getElementById('corregir').addEventListener('click', () => {
+  listo.classList.remove('on');
+  form.style.display = '';
+  pie.style.display  = '';
+  forzar = false;
+  btn.textContent = 'Enviar';
+  refrescar();
+  window.scrollTo(0,0);
+});
+</script>
+</body>
+</html>

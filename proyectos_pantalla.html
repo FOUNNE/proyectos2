@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Votación de proyectos — Pantalla · PEDI FOUNNE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Archivo+Narrow:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B3F71;
+    --navy-d:#072E55;
+    --violeta:#7654A0;
+    --teal:#4097AB;
+    --azul:#4A7BB3;
+    --magenta:#A8548C;
+    --claro:#E6EDF6;
+    --tenue:#9BB4D2;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{
+    background:var(--navy);color:var(--claro);
+    font-family:"Archivo","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    display:flex;flex-direction:column;
+  }
+
+  /* ---------- Encabezado ---------- */
+  header{padding:clamp(14px,2.1vh,24px) clamp(22px,2.8vw,44px) 0;flex:0 0 auto}
+  .fila{display:flex;align-items:flex-end;justify-content:space-between;gap:28px}
+  .kicker{
+    font-family:"Archivo Narrow",sans-serif;font-size:clamp(11px,1vw,15px);
+    letter-spacing:.12em;text-transform:uppercase;color:var(--tenue);margin:0 0 5px;
+  }
+  h1{
+    margin:0;font-size:clamp(22px,2.7vw,40px);font-weight:700;
+    letter-spacing:-.02em;color:#fff;line-height:1.05;
+  }
+  .cifras{display:flex;gap:clamp(18px,2.2vw,34px);flex:0 0 auto;text-align:right}
+  .cifra b{display:block;font-size:clamp(26px,3vw,46px);font-weight:700;color:#fff;line-height:1}
+  .cifra span{
+    font-family:"Archivo Narrow",sans-serif;font-size:clamp(10px,.8vw,13px);
+    color:var(--tenue);letter-spacing:.06em;text-transform:uppercase;
+  }
+  .arco{display:block;width:100%;height:14px;margin-top:clamp(8px,1.3vh,15px)}
+
+  /* ---------- Ranking ---------- */
+  main{
+    flex:1 1 auto;position:relative;overflow:hidden;
+    padding:clamp(10px,1.6vh,20px) clamp(22px,2.8vw,44px) 0;
+  }
+  .cols{
+    display:grid;grid-template-columns:1fr 1fr;
+    gap:0 clamp(24px,3vw,48px);height:100%;
+  }
+  .col{display:flex;flex-direction:column;height:100%}
+
+  /* Cada columna reparte su alto entre 10 filas, así las dos quedan alineadas
+     y el ranking ocupa toda la pantalla del proyector. */
+  .item{
+    flex:1 1 0;min-height:0;
+    display:grid;
+    grid-template-columns:clamp(26px,2.1vw,38px) minmax(0,1fr);
+    gap:0 clamp(7px,.7vw,12px);
+    align-items:center;
+    padding:clamp(2px,.4vh,6px) 0;
+  }
+  .puesto{
+    font-family:"Archivo Narrow",sans-serif;font-weight:700;
+    font-size:clamp(13px,1.15vw,19px);color:#5E7BA3;text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  .item.top .puesto{color:#F0C860}
+
+  .cuerpo{min-width:0}
+  .rotulo{
+    display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+    margin-bottom:clamp(1px,.25vh,4px);
+  }
+  .nom{
+    font-size:clamp(12px,1.12vw,19px);font-weight:600;color:#C5D4E8;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;
+  }
+  .item.top .nom{color:#fff;font-weight:700}
+  .cifra-v{flex:0 0 auto;display:flex;align-items:baseline;gap:6px}
+  .votos{
+    font-size:clamp(13px,1.25vw,21px);font-weight:700;color:#fff;
+    font-variant-numeric:tabular-nums;
+  }
+  .item:not(.top) .votos{color:#A8BDD8}
+  .mesas{
+    font-family:"Archivo Narrow",sans-serif;font-size:clamp(9px,.78vw,13px);
+    color:var(--tenue);white-space:nowrap;
+  }
+
+  .riel{
+    height:clamp(7px,.95vh,13px);background:rgba(255,255,255,.08);
+    border-radius:99px;overflow:hidden;
+  }
+  .barra{
+    height:100%;border-radius:99px;width:0;
+    transition:width .7s cubic-bezier(.22,.8,.3,1);
+  }
+  .item:not(.top) .barra{opacity:.5}
+
+  /* Línea de corte después del 7°. Alto 0 para no desalinear las columnas:
+     el rótulo y la raya se dibujan centrados sobre esa línea. */
+  .corte{
+    height:0;flex:0 0 0;margin:0 0 0 clamp(33px,2.8vw,50px);
+    display:flex;align-items:center;gap:10px;overflow:visible;
+  }
+  .corte .raya{flex:1 1 auto;height:0;border-top:1.5px dashed rgba(240,200,96,.5)}
+  .corte span{
+    font-family:"Archivo Narrow",sans-serif;font-size:clamp(9px,.78vw,13px);
+    letter-spacing:.09em;text-transform:uppercase;color:#D9B758;white-space:nowrap;
+  }
+
+  .vacio{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    color:var(--tenue);font-size:clamp(17px,1.7vw,27px);text-align:center;padding:0 40px;
+  }
+  .vacio.oculto{display:none}
+  .cols.oculto{visibility:hidden}
+
+  /* ---------- Pie ---------- */
+  footer{
+    flex:0 0 auto;
+    padding:clamp(8px,1.2vh,14px) clamp(22px,2.8vw,44px) clamp(12px,1.8vh,20px);
+    display:flex;align-items:center;justify-content:space-between;gap:20px;
+    border-top:1px solid rgba(255,255,255,.12);
+  }
+  .url{font-size:clamp(12px,1vw,16px);color:var(--claro)}
+  .url code{font-family:"Archivo",monospace;color:#fff;font-weight:700;font-size:clamp(13px,1.15vw,18px)}
+  .ayuda{
+    font-family:"Archivo Narrow",sans-serif;
+    font-size:clamp(10px,.85vw,13px);color:var(--tenue);text-align:right;
+  }
+  .punto{
+    display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--teal);
+    margin-right:7px;vertical-align:middle;
+  }
+  .punto.late{animation:late 2.4s ease-in-out infinite}
+  @keyframes late{0%,100%{opacity:1}50%{opacity:.25}}
+  @media (prefers-reduced-motion:reduce){
+    .barra{transition:none}
+    .punto.late{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="fila">
+    <div>
+      <p class="kicker">Taller participativo 2 · PEDI 2027–2032</p>
+      <h1>Los proyectos más votados por las mesas</h1>
+    </div>
+    <div class="cifras">
+      <div class="cifra"><b id="nMesas">0</b><span>mesas</span></div>
+      <div class="cifra"><b id="nVotos">0</b><span>votos</span></div>
+    </div>
+  </div>
+  <svg class="arco" viewBox="0 0 1000 14" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="gpedi" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%"   stop-color="#4097AB"/>
+        <stop offset="50%"  stop-color="#4A7BB3"/>
+        <stop offset="100%" stop-color="#9B7BC4"/>
+      </linearGradient>
+    </defs>
+    <path d="M0 14 Q500 -12 1000 14" fill="none" stroke="url(#gpedi)" stroke-width="4"/>
+  </svg>
+</header>
+
+<main>
+  <div class="cols oculto" id="cols">
+    <div class="col" id="colA"></div>
+    <div class="col" id="colB"></div>
+  </div>
+  <div class="vacio" id="vacio">Esperando los votos de las mesas…</div>
+</main>
+
+<footer>
+  <div class="url">Cargá los de tu mesa en <code id="urlMesa">founne.github.io/2taller</code></div>
+  <div class="ayuda"><span class="punto late"></span>Se actualiza solo cada 5 segundos · F para pantalla completa</div>
+</footer>
+
+<script>
+/* ====== CONFIGURACIÓN ====== */
+const API = 'PEGAR_ACA_LA_URL_/exec';
+const ELEGIDOS = 7;        // cuántos proyectos destaca el corte
+/* =========================== */
+
+const COLOR_LINEA = {1:'#4097AB', 2:'#4A7BB3', 3:'#7654A0', 4:'#A8548C'};
+
+/* Mismos códigos y orden que el formulario y el Apps Script. */
+const PROYECTOS = {
+  '1.2.a':       {linea:1, corto:'Planes de estudio'},
+  '1.2.c':       {linea:1, corto:'Posgrado y especializaciones'},
+  '1.3.f':       {linea:1, corto:'Práctica Profesional Supervisada'},
+  '1.3.a':       {linea:1, corto:'Modalidades de cursado'},
+  '1.3.e':       {linea:1, corto:'Odontología digital e IA'},
+  '1.1.a':       {linea:1, corto:'Formación docente continua'},
+  '1.2.d':       {linea:1, corto:'Inserción de estudiantes y graduados'},
+  '2.1.b':       {linea:2, corto:'Plan Master de Infraestructura'},
+  '2.1.c':       {linea:2, corto:'Equipamiento clínico'},
+  '2.3.b':       {linea:2, corto:'Transparencia en carrera docente'},
+  '2.2.a':       {linea:2, corto:'Gobernanza y cogobierno'},
+  '3.1.a':       {linea:3, corto:'Líneas de investigación'},
+  '3.4.a':       {linea:3, corto:'Hospital Universitario'},
+  '3.1.c':       {linea:3, corto:'Financiamiento para investigación'},
+  '3.3.a':       {linea:3, corto:'Curricularización de la extensión'},
+  '3.3.b/3.3.c': {linea:3, corto:'Alianzas y convenios'},
+  '4.1.a':       {linea:4, corto:'Becas'},
+  '4.1.d':       {linea:4, corto:'Actividades culturales y deportivas'},
+  '4.2.b':       {linea:4, corto:'Comunicación institucional'},
+  '4.2.a/4.2.c': {linea:4, corto:'Promoción de la salud bucal'}
+};
+
+const colA  = document.getElementById('colA');
+const colB  = document.getElementById('colB');
+const cols  = document.getElementById('cols');
+const vacio = document.getElementById('vacio');
+
+let montado = false;     // las filas se crean una vez y después solo se actualizan
+let ordenPrevio = '';    // para reordenar solo cuando el ranking cambia de verdad
+let nodos = {};          // código de proyecto -> su fila en el DOM
+let corteEl = null;      // la línea punteada del corte de los 7
+
+function nodoItem(cod){
+  const p = PROYECTOS[cod];
+  const el = document.createElement('div');
+  el.className = 'item';
+  el.dataset.cod = cod;
+  el.innerHTML =
+    '<div class="puesto"></div>' +
+    '<div class="cuerpo">' +
+      '<div class="rotulo">' +
+        '<span class="nom">' + p.corto + '</span>' +
+        '<span class="cifra-v"><span class="votos">0</span><span class="mesas"></span></span>' +
+      '</div>' +
+      '<div class="riel"><div class="barra" style="background:' + COLOR_LINEA[p.linea] + '"></div></div>' +
+    '</div>';
+  return el;
+}
+
+function nodoCorte(){
+  const el = document.createElement('div');
+  el.className = 'corte';
+  el.id = 'corte';
+  el.innerHTML = '<span>Los ' + ELEGIDOS + ' más votados</span><div class="raya"></div>';
+  return el;
+}
+
+function pintar(datos){
+  const lista = datos.proyectos
+    .filter(p => PROYECTOS[p.cod])
+    .slice()
+    .sort((a,b) => b.votos - a.votos || b.mesas - a.mesas || a.cod.localeCompare(b.cod));
+
+  const max = Math.max(1, lista[0] ? lista[0].votos : 1);
+  const mitad = Math.ceil(lista.length / 2);
+
+  // Las filas se crean una sola vez; después solo cambian de lugar y de valor.
+  if(!montado){
+    colA.textContent = ''; colB.textContent = '';
+    nodos = {};
+    lista.forEach(p => nodos[p.cod] = nodoItem(p.cod));
+    corteEl = nodoCorte();
+    montado = true;
+    ordenPrevio = '';
+  }
+
+  lista.forEach((p, i) => {
+    const el = nodos[p.cod];
+    if(!el) return;
+    el.querySelector('.puesto').textContent = (i + 1) + '°';
+    el.querySelector('.votos').textContent = p.votos;
+    el.querySelector('.mesas').textContent = p.mesas ? '· ' + p.mesas + ' mesas' : '';
+    el.querySelector('.barra').style.width = (100 * p.votos / max).toFixed(1) + '%';
+    el.classList.toggle('top', i < ELEGIDOS);
+  });
+
+  // Reordenar solo si el ranking cambió: mover nodos corta la transición de la barra.
+  const orden = lista.map(p => p.cod).join('|');
+  if(orden !== ordenPrevio){
+    ordenPrevio = orden;
+    lista.forEach((p, i) => {
+      const el = nodos[p.cod];
+      if(!el) return;
+      if(i < mitad){
+        if(i === ELEGIDOS && mitad > ELEGIDOS) colA.appendChild(corteEl);
+        colA.appendChild(el);          // appendChild mueve el nodo si ya estaba
+      } else {
+        colB.appendChild(el);
+      }
+    });
+  }
+}
+
+async function traer(){
+  try{
+    const r = await fetch(API + '?accion=resultados&t=' + Date.now());
+    const j = await r.json();
+    if(!j || !j.ok) return;
+
+    document.getElementById('nMesas').textContent = j.mesas || 0;
+    document.getElementById('nVotos').textContent = j.votos_emitidos || 0;
+
+    if(!j.mesas){
+      vacio.classList.remove('oculto');
+      cols.classList.add('oculto');
+      return;
+    }
+    vacio.classList.add('oculto');
+    cols.classList.remove('oculto');
+    pintar(j);
+  }catch(e){ /* reintenta en el próximo ciclo */ }
+}
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'f' || e.key === 'F'){
+    if(document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+  }
+  if(e.key === 'r' || e.key === 'R') traer();
+});
+
+traer();
+setInterval(traer, 5000);
+</script>
+</body>
+</html>
