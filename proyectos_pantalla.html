@@ -194,28 +194,29 @@ const ELEGIDOS = 7;        // cuántos proyectos destaca el corte
 
 const COLOR_LINEA = {1:'#4097AB', 2:'#4A7BB3', 3:'#7654A0', 4:'#A8548C'};
 
-/* Mismos códigos y orden que el formulario y el Apps Script. */
+/* Mismos códigos y orden que el formulario y el Apps Script.
+   Los rótulos son la versión corta de los títulos de la grilla impresa. */
 const PROYECTOS = {
-  '1.2.a':       {linea:1, corto:'Planes de estudio'},
-  '1.2.c':       {linea:1, corto:'Posgrado y especializaciones'},
-  '1.3.f':       {linea:1, corto:'Práctica Profesional Supervisada'},
-  '1.3.a':       {linea:1, corto:'Modalidades de cursado'},
-  '1.3.e':       {linea:1, corto:'Odontología digital e IA'},
-  '1.1.a':       {linea:1, corto:'Formación docente continua'},
-  '1.2.d':       {linea:1, corto:'Inserción de estudiantes y graduados'},
-  '2.1.b':       {linea:2, corto:'Plan Master de Infraestructura'},
+  '1.2.a':       {linea:1, corto:'Plan de Estudio'},
+  '1.2.c':       {linea:1, corto:'Formación de Posgrado'},
+  '1.3.f':       {linea:1, corto:'Práctica Clínica en el Grado'},
+  '1.3.a':       {linea:1, corto:'Flexibilización del cursado'},
+  '1.3.e':       {linea:1, corto:'Nuevas tecnologías e IA'},
+  '1.1.a':       {linea:1, corto:'Formación Docente Continua'},
+  '1.2.d':       {linea:1, corto:'Acompañamiento a estudiantes'},
+  '2.1.b':       {linea:2, corto:'Infraestructura y Servicios'},
   '2.1.c':       {linea:2, corto:'Equipamiento clínico'},
-  '2.3.b':       {linea:2, corto:'Transparencia en carrera docente'},
-  '2.2.a':       {linea:2, corto:'Gobernanza y cogobierno'},
-  '3.1.a':       {linea:3, corto:'Líneas de investigación'},
+  '2.3.b':       {linea:2, corto:'Carreras Docente y Nodocente'},
+  '2.2.a':       {linea:2, corto:'Gobernanza y Cogobierno'},
+  '3.1.a':       {linea:3, corto:'Líneas de Investigación'},
   '3.4.a':       {linea:3, corto:'Hospital Universitario'},
-  '3.1.c':       {linea:3, corto:'Financiamiento para investigación'},
-  '3.3.a':       {linea:3, corto:'Curricularización de la extensión'},
-  '3.3.b/3.3.c': {linea:3, corto:'Alianzas y convenios'},
+  '3.1.c':       {linea:3, corto:'Financiamiento para Investigación'},
+  '3.3.a':       {linea:3, corto:'Extensión Universitaria'},
+  '3.3.b/3.3.c': {linea:3, corto:'Alianzas y Convenios'},
   '4.1.a':       {linea:4, corto:'Becas'},
-  '4.1.d':       {linea:4, corto:'Actividades culturales y deportivas'},
-  '4.2.b':       {linea:4, corto:'Comunicación institucional'},
-  '4.2.a/4.2.c': {linea:4, corto:'Promoción de la salud bucal'}
+  '4.1.d':       {linea:4, corto:'Actividades Culturales y Deportivas'},
+  '4.2.b':       {linea:4, corto:'Comunicación Institucional'},
+  '4.2.a/4.2.c': {linea:4, corto:'Valor Público: Salud Bucal'}
 };
 
 const colA  = document.getElementById('colA');
