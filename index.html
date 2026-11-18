@@ -290,13 +290,13 @@ LINEAS.forEach(L => {
     fila.dataset.cod = p.cod;
     fila.innerHTML =
       '<div class="txt">' +
-        '<span class="cod">' + p.n + ' · ' + p.cod + '</span>' +
+        '<span class="cod">' + p.n + '</span>' +
         '<span class="nom">' + p.nombre + '</span>' +
       '</div>' +
       '<div class="stepper">' +
-        '<button type="button" data-op="menos" aria-label="Quitar un voto a ' + p.cod + '">−</button>' +
+        '<button type="button" data-op="menos" aria-label="Quitar un voto a ' + p.corto + '">−</button>' +
         '<span class="val cero" data-val>0</span>' +
-        '<button type="button" data-op="mas" aria-label="Sumar un voto a ' + p.cod + '">+</button>' +
+        '<button type="button" data-op="mas" aria-label="Sumar un voto a ' + p.corto + '">+</button>' +
       '</div>';
     bloque.appendChild(fila);
   });
@@ -455,7 +455,7 @@ btn.addEventListener('click', async () => {
   const elegidos = PROYECTOS.filter(p => votos[p.cod] > 0)
     .sort((a,b) => votos[b.cod] - votos[a.cod] || a.n - b.n);
   document.getElementById('resumen').innerHTML = elegidos.map(p =>
-    '<div><span>' + p.cod + ' · ' + p.corto + '</span><span class="n">' + votos[p.cod] + '</span></div>'
+    '<div><span>' + p.corto + '</span><span class="n">' + votos[p.cod] + '</span></div>'
   ).join('');
 
   form.style.display = 'none';
